@@ -16,7 +16,7 @@ const PT_MENTAIKO = 'mentaiko_user';
 // 필드 키 상수.
 const F_USER_NAME = 'mentaiko_user_name';
 const F_EMAIL     = 'mentaiko_email';
-const F_REFERER   = 'mentaiko_referer';
+const F_REFERRER  = 'mentaiko_referrer';
 const F_AVATAR    = 'mentaiko_avatar';
 
 /**
@@ -94,10 +94,23 @@ if ( ! function_exists( 'mentaiko_meta_boxes' ) ) {
 		];
 
 		$field_referrer = [
-			'id'       => 'mentaiko_referrer',
-			'name'     => '추천인',
 			'type'     => 'mentaiko-referrer',
+			'name'     => '추천인',
+			'id'       => F_REFERRER,
+			'desc'     => '커스텀 필드. 두 항목 모두 필수 입력.',
 			'required' => true,
+
+			'sanitize_callback' => function ( array $value ): array {
+				$default = [
+					'group' => '',
+					'name'  => '',
+				];
+
+				$value['group'] = sanitize_key( $value['group'] );
+				$value['name']  = sanitize_text_field( $value['name'] );
+
+				return array_intersect_key( wp_parse_args( $value, $default ), $default );
+			},
 		];
 
 		$field_avatar = [
@@ -112,7 +125,7 @@ if ( ! function_exists( 'mentaiko_meta_boxes' ) ) {
 
 		$meta_boxes[] = [
 			'title'      => '사용자 프로필',
-			'id'         => 'mentaoko-user-profile',
+			'id'         => 'mentaiko-user-profile',
 			'post_types' => PT_MENTAIKO,
 			'context'    => 'normal',
 			'fields'     => [
